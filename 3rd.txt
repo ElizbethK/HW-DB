@@ -1,0 +1,74 @@
+#3
+
+april_19=# SELECT * FROM s;
+
+  ks   |  sfn   |   sln    | kt | gender |  h  | salary
+-------+--------+----------+----+--------+-----+---------
+  1002 | Ian    | Holm     |  2 | m      | 169 | 1200.00
+  1003 | Milla  | Jovovich |  2 | f      | 176 | 2100.00
+  1004 | Chris  | Tucker   |  2 | m      | 190 |  900.00
+  1005 | Luke   | Perry    |  3 | m      | 167 |  950.00
+  1006 | Brion  | James    |  3 | m      | 200 | 1100.00
+  1007 | Lee    | Evans    |  3 | m      | 178 |  500.00
+  1001 | Gary   | Oldman   |  1 | m      | 167 | 2500.00
+  1234 | Ivan   | Ivanov   |  3 | m      | 199 |  501.00
+  3333 | Petr   | Petrov   |  3 | m      | 170 | 1200.00
+  2222 | Steven | King     |  3 | m      | 193 | 4999.00
+  1100 | Grette | Tundberg |  1 | f      | 149 | 3899.00
+ 10020 | Ian    | Holm     |  2 | m      | 169 | 1200.00
+ 10030 | Milla  | Jovovich |  2 | f      | 176 | 2100.00
+ 10040 | Chris  | Tucker   |  2 | m      | 190 |  900.00
+ 10050 | Luke   | Perry    |  3 | m      | 167 |  950.00
+ 10060 | Brion  | James    |  3 | m      | 200 | 1100.00
+ 10070 | Lee    | Evans    |  3 | m      | 178 |  500.00
+ 10010 | Gary   | Oldman   |  1 | m      | 167 | 2500.00
+ 12340 | Ivan   | Ivanov   |  3 | m      | 199 |  501.00
+ 33330 | Petr   | Petrov   |  3 | m      | 170 | 1200.00
+ 22220 | Steven | King     |  3 | m      | 193 | 4999.00
+ 22221 | Steven | King     |  3 | m      | 193 | 4999.00
+ 11000 | Grette | Tundberg |  1 | f      | 149 | 3899.00
+ 11001 | Grette | Tundberg |  1 | f      | 149 | 3899.00
+ 12000 | Ian    | Holm     |  2 | m      | 169 | 1200.00
+(25 ёЄЁюъ)
+
+
+april_19=# --"насколько средняя продолжительность звонков абонентов отличается от средней по тарифу" - tarrif_difference:
+
+april_19=# SELECT s.kt, s.sfn, s.sln, AVG(f.dur) as avg_dur, s.kt, t.monthmins,
+april_19-# AVG(f.dur) - t.monthmins AS tarrif_difference
+april_19-# FROM s INNER JOIN f ON s.ks = f.ks
+april_19-# INNER JOIN t ON s.kt = t.kt
+april_19-# GROUP BY s.kt, s.sfn, s.sln, t.monthmins
+april_19-# ORDER BY kt ASC;
+ kt |  sfn  |   sln    |       avg_dur        | kt | monthmins |   tarrif_difference
+----+-------+----------+----------------------+----+-----------+-----------------------
+  1 | Gary  | Oldman   |  16.8333333333333333 |  1 |       300 | -283.1666666666666667
+  2 | Milla | Jovovich |  12.0000000000000000 |  2 |       150 | -138.0000000000000000
+  2 | Ian   | Holm     | 112.0000000000000000 |  2 |       150 |  -38.0000000000000000
+  2 | Chris | Tucker   |  20.0000000000000000 |  2 |       150 | -130.0000000000000000
+  3 | Luke  | Perry    |  30.7500000000000000 |  3 |        10 |   20.7500000000000000
+  3 | Brion | James    |  10.0000000000000000 |  3 |        10 |    0.0000000000000000
+  3 | Lee   | Evans    |  21.0000000000000000 |  3 |        10 |   11.0000000000000000
+(7 ёЄЁюъ)
+
+
+april_19=# "насколько средняя продолжительность звонков абонентов отличается от общей средней продолжительности звонка":
+
+april_19=# SELECT s.kt, s.sfn, s.sln, AVG(f.dur) as avg_dur, s.kt, t.monthmins,
+april_19-# AVG(f.dur) - t.monthmins AS tarrif_difference,
+april_19-# (SELECT AVG(f2.dur) FROM f LEFT JOIN f AS f2 ON f.ks = f2.ks) AS common_avg,
+april_19-# AVG(f.dur) - (SELECT AVG(f2.dur) FROM f LEFT JOIN f AS f2 ON f.ks = f2.ks) AS abonents_difference
+april_19-# FROM s INNER JOIN f ON s.ks = f.ks
+april_19-# INNER JOIN t ON s.kt = t.kt
+april_19-# GROUP BY s.kt, s.sfn, s.sln, t.monthmins, f.ks
+april_19-# ORDER BY kt ASC;
+ kt |  sfn  |   sln    |       avg_dur        | kt | monthmins |   tarrif_difference   |     common_avg      | abonents_difference
+----+-------+----------+----------------------+----+-----------+-----------------------+---------------------+----------------------
+  1 | Gary  | Oldman   |  16.8333333333333333 |  1 |       300 | -283.1666666666666667 | 44.4239130434782609 | -27.5905797101449276
+  2 | Chris | Tucker   |  20.0000000000000000 |  2 |       150 | -130.0000000000000000 | 44.4239130434782609 | -24.4239130434782609
+  2 | Ian   | Holm     | 112.0000000000000000 |  2 |       150 |  -38.0000000000000000 | 44.4239130434782609 |  67.5760869565217391
+  2 | Milla | Jovovich |  12.0000000000000000 |  2 |       150 | -138.0000000000000000 | 44.4239130434782609 | -32.4239130434782609
+  3 | Brion | James    |  10.0000000000000000 |  3 |        10 |    0.0000000000000000 | 44.4239130434782609 | -34.4239130434782609
+  3 | Lee   | Evans    |  21.0000000000000000 |  3 |        10 |   11.0000000000000000 | 44.4239130434782609 | -23.4239130434782609
+  3 | Luke  | Perry    |  30.7500000000000000 |  3 |        10 |   20.7500000000000000 | 44.4239130434782609 | -13.6739130434782609
+(7 ёЄЁюъ)

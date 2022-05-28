@@ -1,0 +1,83 @@
+#5
+Создать триггер журнализации изменения тарифов.
+
+
+april_19=# SELECT * FROM t;
+ kt |   nt    | monthfee | monthmins | minfee
+----+---------+----------+-----------+--------
+  1 | Mini    |   400.00 |       300 |   1.00
+  2 | Average |   200.00 |       150 |   3.00
+  3 | Maxi    |     0.00 |        10 |   5.00
+(3 ёЄЁюъш)
+
+
+
+--creating a table "t_audit": 
+
+april_19=# CREATE TABLE t_audit(
+april_19(#     operation         char(1)                 NOT NULL,
+april_19(#     stamp             timestamp               NOT NULL,
+april_19(#     userid            text                    NOT NULL,
+april_19(#      kt                integer                 NOT NULL,
+april_19(#     nt              character varying(20)     NOT NULL,
+april_19(#     monthfee          numeric(12,2)           NOT NULL,
+april_19(#     monthmins         integer                 NOT NULL,
+april_19(#     minfee            numeric(12,2)           NOT NULL
+april_19(# );
+CREATE TABLE
+
+
+
+-- creating a function:
+
+april_19=# CREATE OR REPLACE FUNCTION process_t_audit() RETURNS TRIGGER AS $t_audit$
+april_19$#     BEGIN
+april_19$#         IF (TG_OP = 'DELETE') THEN
+april_19$#             INSERT INTO t_audit SELECT 'D', now(), user, OLD.*;
+april_19$#         ELSIF (TG_OP = 'UPDATE') THEN
+april_19$#             INSERT INTO t_audit SELECT 'U', now(), user, NEW.*;
+april_19$#         ELSIF (TG_OP = 'INSERT') THEN
+april_19$#             INSERT INTO t_audit SELECT 'I', now(), user, NEW.*;
+april_19$#         END IF;
+april_19$#         RETURN NULL;
+april_19$#     END;
+april_19$# $t_audit$ LANGUAGE plpgsql;
+CREATE FUNCTION
+
+
+-- creating a trigger:
+
+april_19=# CREATE TRIGGER t_audit
+april_19-# AFTER INSERT OR UPDATE OR DELETE ON t
+april_19-#     FOR EACH ROW EXECUTE PROCEDURE process_t_audit();
+CREATE TRIGGER
+april_19=#
+april_19=#
+
+
+-- viewing created table:
+
+april_19=# SELECT * FROM t_audit;
+ operation | stamp | userid | kt | nt | monthfee | monthmins | minfee
+-----------+-------+--------+----+----+----------+-----------+--------
+(0 ёЄЁюъ)
+
+
+
+-- updating some value in "t" table:
+
+april_19=# UPDATE t SET monthmins = 20 WHERE monthmins = 10;
+UPDATE 1
+
+
+
+
+-- viewing recorded changes in the "t_audit" table:
+
+april_19=# SELECT * FROM t_audit;
+ operation |           stamp            |  userid  | kt |  nt  | monthfee | monthmins | minfee
+-----------+----------------------------+----------+----+------+----------+-----------+--------
+ U         | 2022-05-28 00:09:40.021254 | postgres |  3 | Maxi |     0.00 |        20 |   5.00
+(1 ёЄЁюър)
+
+

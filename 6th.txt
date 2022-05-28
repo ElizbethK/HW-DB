@@ -1,0 +1,44 @@
+#6 Designing the database of distributed IT development company.
+
+
+CREATE TABLE office
+(
+	office_name text PRIMARY KEY
+);
+
+
+CREATE TABLE customer
+(
+	custm_code varchar(16) PRIMARY KEY,
+	custm_name varchar(32),
+	custm_surname varchar(32)
+);
+
+
+CREATE TABLE team
+(
+	team_code varchar(16) PRIMARY KEY
+);
+
+
+CREATE TABLE employee
+(
+	emp_code varchar(16) PRIMARY KEY,
+	emp_name varchar(32) NOT NULL,
+	emp_surname varchar(32) NOT NULL,
+	emp_age int NOT NULL,
+	emp_pos varchar(64) NOT NULL,
+	emp_sal int CHECK (emp_sal > 0),
+	office_name text REFERENCES office(office_name),
+	team_code varchar(16) REFERENCES team(team_code)
+);
+
+
+CREATE TABLE project
+(
+	project_code int PRIMARY KEY,
+	custm_code varchar(16) REFERENCES customer(custm_code),
+	team_code varchar(16) REFERENCES team(team_code),
+	budget int CHECK(budget > 0),
+	dd timestamp NOT NULL
+);
