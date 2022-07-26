@@ -1,14 +1,14 @@
-# HW-DB
+# HW-Databases
 
-1st.	В таблицу абонентов (customers – “s”) ошибочно внесены дубликаты. Найти их.
+1st.	Duplicates were mistakenly entered into the subscribers table (customers – “s”). Find them.
 
-2nd.	Найти ситуацию, при которой длительность звонка превышает 30 минут, а непосредственно предшествующий ему звонок этого абонента – менее 5 минут.
+2nd.	Find a situation in which the duration of the call exceeds 30 minutes, and the call of this subscriber immediately preceding it is less than 5 minutes.
 
-3rd.	Подсчитать, насколько средняя продолжительность звонков абонентов отличается от средней по тарифу, на который этот абонент подключен, и общей средней продолжительности звонка. Сделать два варианта – с использованием аналитической функции и без использования.
+3rd.	Calculate how much the average duration of subscribers' calls differs from the average for the tariff to which this subscriber is connected, and the total average duration of the call. Make two options – using the analytical function and without using it.
 
-4th.	Таблица абонентов содержит их зарплату. При помощи процедуры, содержащей курсор, откорректировать зарплату: если меньше 50 – установить 50. 
+4th. The subscribers table contains their salary. Using the procedure containing the cursor, adjust the salary: if less than 50 – set 50. 
 
-5th.	Создать триггер журнализации изменения тарифов.
+5th.	Create a trigger for logging tariff changes.
 
-6th. Требуется спроектировать базу данных по приведённым требованиям. 
+6th. It is required to design a database according to the above requirements.
 ![6th](https://user-images.githubusercontent.com/101325108/170822296-e23486bf-1145-4d37-a61b-b670f657dfca.jpg)
